@@ -90,12 +90,12 @@ interface FilePayload {
 }
 
 const CreditCustomers = () => {
-      const navigate = useNavigate();
-    
-      const Exit = () => {
-          navigate('/');
-      };
-    
+    const navigate = useNavigate();
+
+    const Exit = () => {
+        navigate('/');
+    };
+
     // --- STATE MANAGEMENT ---
     const financialMetrics = [
         'Sales Proceed SAR MN', 'NIAT (profit after tax) SAR MN', 'Total Assets SAR MN', 'Receiveable SAR MN',
@@ -314,7 +314,7 @@ const CreditCustomers = () => {
             const response = await fetch(Url, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
             });
-
+            navigate('/');
             if (response.ok) {
                 setStatusMessage("Form submitted successfully!");
                 setFormData({ ...initialFormData });
@@ -1305,45 +1305,45 @@ const CreditCustomers = () => {
                 </div>
 
                 {/* Submit and Exit Buttons */}
-            <div className="text-center pb-3" style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-  <button
-    type="submit"
-    className="btn"
-    style={{
-      backgroundColor: '#ffc107',
-      color: 'black',
-      border: 'none',
-      borderRadius: '5px',
-      padding: '8px 16px',
-      fontSize: '1rem',
-      cursor: 'pointer'
-    }}
-    disabled={loading}
-  >
-    {loading ? 'Submitting...' : 'Submit'}
-  </button>
+                <div className="text-center pb-3" style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+                    <button
+                        type="submit"
+                        className="btn"
+                        style={{
+                            backgroundColor: '#ffc107',
+                            color: 'black',
+                            border: 'none',
+                            borderRadius: '5px',
+                            padding: '8px 16px',
+                            fontSize: '1rem',
+                            cursor: 'pointer'
+                        }}
+                        disabled={loading}
+                    >
+                        {loading ? 'Submitting...' : 'Submit'}
+                    </button>
 
-  <button
-    type="button"
-    className="btn"
-    style={{
-      backgroundColor: '#dc3545',
-      color: 'white',
-      border: 'none',
-      borderRadius: '5px',
-      padding: '8px 16px',
-      fontSize: '1rem',
-      cursor: 'pointer'
-    }}
-   onClick={Exit} 
-  >
-    Exit
-  </button>
-</div>
+                    <button
+                        type="button"
+                        className="btn"
+                        style={{
+                            backgroundColor: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '5px',
+                            padding: '8px 16px',
+                            fontSize: '1rem',
+                            cursor: 'pointer'
+                        }}
+                        onClick={Exit}
+                    >
+                        Exit
+                    </button>
+                </div>
 
             </form>
 
-            {/* Loading Modal */}
+            {/* Loading Modal
             {loading && (
                 <div className="modal fade show" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', inset: 0, zIndex: 1050 }}>
                     <div className="modal-dialog modal-dialog-centered">
@@ -1357,7 +1357,7 @@ const CreditCustomers = () => {
                 </div>
             )}
 
-            {/* Success / Error Message Modal */}
+           
             {statusMessage && !loading && (
                 <div className="modal fade show" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', inset: 0, zIndex: 1050 }}>
                     <div className="modal-dialog modal-dialog-centered">
@@ -1369,7 +1369,32 @@ const CreditCustomers = () => {
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
+
+            {/* Loading Modal */}
+{loading && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-yellow-500 mx-auto mb-4"></div>
+      <h5 className="text-lg font-medium text-gray-800">Submitting your form...</h5>
+    </div>
+  </div>
+)}
+
+{/* Success / Error Message Modal */}
+{statusMessage && !loading && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bgOpacity-50">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+      <h5 className="text-lg font-medium text-gray-800 mb-4">{statusMessage}</h5>
+      <button
+        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        onClick={() => setStatusMessage(null)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
         </div>
     );
 };
