@@ -1,0 +1,50 @@
+.navbarContainer {
+    position: sticky; /* Keeps it visible while scrolling */
+    top: 0;
+    z-index: 100; /* Stays above other content */
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 100%;
+}
+
+.navbarLeft {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between logo and button */
+    margin-left: 57px;
+}
+
+.navbarLogo {
+    height: 40px; /* Fixed logo height */
+    width: auto; /* Keep aspect ratio */
+}
+
+.navbarButton {
+    background-color: #ffc107;
+    color: #1c325d;
+    border: none;
+    border-radius: 3px;
+    padding: 8px 16px;
+    font-weight: 700;
+    font-family: "Open Sans", sans-serif;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.navbarButton:hover {
+    background-color: #e0a800;
+}
+
+.navbarTitle {
+    color: #1c325d;
+    font-size: 1.7em;
+    font-weight: bold;
+    margin-left: 70px;
+    font-family: Gibson, HelveticaNeue-Light, "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
