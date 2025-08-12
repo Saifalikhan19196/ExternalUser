@@ -758,7 +758,7 @@ const CreditCustomers = () => {
                                                     <tr key={i}>
                                                         <td>
                                                             <input
-                                                                style={{ marginTop: '33px' }}
+                                                                style={{ marginTop: '19px' }}
                                                                 type="text"
                                                                 className="form-control"
                                                                 value={contact.Name}
@@ -767,7 +767,7 @@ const CreditCustomers = () => {
                                                         </td>
                                                         <td>
                                                             <input
-                                                                style={{ marginTop: '33px' }}
+                                                                style={{ marginTop: '19px' }}
                                                                 type="text"
                                                                 className="form-control"
                                                                 value={contact.Designation}
@@ -776,7 +776,7 @@ const CreditCustomers = () => {
                                                         </td>
                                                         <td>
                                                             <input
-                                                                style={{ marginTop: '33px' }}
+                                                                style={{ marginTop: '19px' }}
                                                                 type="email"
                                                                 className="form-control"
                                                                 value={contact.Email}
@@ -785,7 +785,7 @@ const CreditCustomers = () => {
                                                         </td>
                                                         <td>
                                                             <input
-                                                                style={{ marginTop: '33px' }}
+                                                                style={{ marginTop: '19px' }}
                                                                 type="text"
                                                                 className="form-control"
                                                                 value={contact.Contact}
@@ -796,7 +796,7 @@ const CreditCustomers = () => {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-outline-primary btn-sm"
-                                                                style={{ margin: "auto", display: "block", minWidth: "120px" }}
+                                                                style={{ margin: "auto", display: "block", minWidth: "120px", marginTop: "26px" }}
                                                                 onClick={() => handleContactUploadClick(i)}
                                                             >
                                                                 Signature Upload
