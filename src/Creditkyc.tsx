@@ -1,5 +1,8 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
+
+
 
 // --- INTERFACES ---
 
@@ -87,6 +90,12 @@ interface FilePayload {
 }
 
 const CreditCustomers = () => {
+      const navigate = useNavigate();
+    
+      const Exit = () => {
+          navigate('/');
+      };
+    
     // --- STATE MANAGEMENT ---
     const financialMetrics = [
         'Sales Proceed SAR MN', 'NIAT (profit after tax) SAR MN', 'Total Assets SAR MN', 'Receiveable SAR MN',
@@ -1296,11 +1305,42 @@ const CreditCustomers = () => {
                 </div>
 
                 {/* Submit and Exit Buttons */}
-                <div className="text-center pb-3">
-                    <button type="submit" className="btn" style={{ backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '5px', padding: '8px 16px', fontSize: '1rem', cursor: 'pointer' }} disabled={loading}>
-                        {loading ? 'Submitting...' : 'Submit'}
-                    </button>
-                </div>
+            <div className="text-center pb-3" style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
+  <button
+    type="submit"
+    className="btn"
+    style={{
+      backgroundColor: '#ffc107',
+      color: 'black',
+      border: 'none',
+      borderRadius: '5px',
+      padding: '8px 16px',
+      fontSize: '1rem',
+      cursor: 'pointer'
+    }}
+    disabled={loading}
+  >
+    {loading ? 'Submitting...' : 'Submit'}
+  </button>
+
+  <button
+    type="button"
+    className="btn"
+    style={{
+      backgroundColor: '#dc3545',
+      color: 'white',
+      border: 'none',
+      borderRadius: '5px',
+      padding: '8px 16px',
+      fontSize: '1rem',
+      cursor: 'pointer'
+    }}
+   onClick={Exit} 
+  >
+    Exit
+  </button>
+</div>
+
             </form>
 
             {/* Loading Modal */}
