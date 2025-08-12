@@ -103,7 +103,7 @@ const CreditCustomers = () => {
     ];
 
     const initialFormData: FormData = {
-        CustomerType: 'CreditCustomers', regionCity: '', applicationDate: new Date().toISOString().split('T')[0], customerchoice: '',
+        CustomerType: 'Credit Customers', regionCity: '', applicationDate: new Date().toISOString().split('T')[0], customerchoice: '',
         tradeNameArabic: '', tradeNameEnglish: '', businessType: '', commercialRegNo: '', companyRegistrationYear: '', unifiedNo: '',
         vatNo: '', mainActivity: '', managingDirector: '', authorizedSignatory: '', noOfBranches: '', noOfEmployees: '',
         nationalAddress: '', officialPhone: '', mobileNo: '', officialWebsite: '', paymentCycle: '', poApproverName: '',

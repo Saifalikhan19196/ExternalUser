@@ -6,14 +6,16 @@ import Navbar from './Navbar.tsx';
 import Footer from './Footer.tsx';
 import KycAndCredit from './CashandCredit.tsx';
 import CreditCustomers from './Creditkyc.tsx';
+import CashCustomers from './CashCustomber.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MemoryRouter>
+    <MemoryRouter initialEntries={['/']}>
       <Navbar />
       <Routes>
         <Route path="/" element={<KycAndCredit />} />
         <Route path="/credit-customers" element={<CreditCustomers />} />
+        <Route path="/cash-customers" element={<CashCustomers/>} />
       </Routes>
       <Footer />
     </MemoryRouter>
