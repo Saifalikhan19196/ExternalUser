@@ -507,7 +507,7 @@ const CashCustomers = () => {
                                     <input
                                         id="noOfBranches"
                                         type="text"
-                                        className="form--control"
+                                        className="form-control"
                                         name='noOfBranches'
                                         value={formData.noOfBranches}
                                         onChange={handleChange}
