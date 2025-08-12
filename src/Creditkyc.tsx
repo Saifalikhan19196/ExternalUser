@@ -14,6 +14,10 @@ interface Project {
     period: string;
 }
 
+interface FileWithPreview extends File {
+    preview?: string;
+}
+
 interface FormData {
     CustomerType: string;
     regionCity: string;
@@ -53,10 +57,19 @@ interface FormData {
     termsAuthorizedSignatory: string;
     termsNameOfSponsor: string;
     termsKAMName: string;
-}
-
-interface FileWithPreview extends File {
-    preview?: string;
+    termsStampFile: FileWithPreview | null;
+    termsSponsorSignatureFile: FileWithPreview | null;
+    termsAuthorizedSignatureFile: FileWithPreview | null;
+    termsKAMSignatureFile: FileWithPreview | null;
+    // Files for Required Documents section
+    docAuthSignatoryIdFile: FileWithPreview | null;
+    docMainCommCertFile: FileWithPreview | null;
+    docVatCertFile: FileWithPreview | null;
+    docBankStmtFile: FileWithPreview | null;
+    docIncorpContractFile: FileWithPreview | null;
+    docFinancialStmtFile: FileWithPreview | null;
+    docPowerOfAttorneyFile: FileWithPreview | null;
+    docSponsorIdFile: FileWithPreview | null;
 }
 
 interface ContactDetail {
@@ -64,7 +77,7 @@ interface ContactDetail {
     Designation: string;
     Email: string;
     Contact: string;
-    signatureFile: FileWithPreview | null; // Each contact has its own file
+    signatureFile: FileWithPreview | null;
 }
 
 interface FilePayload {
@@ -73,73 +86,34 @@ interface FilePayload {
     content: string; // base64
 }
 
-
 const CreditCustomers = () => {
     // --- STATE MANAGEMENT ---
-
     const financialMetrics = [
-        'Sales Proceed SAR MN',
-        'NIAT (profit after tax) SAR MN',
-        'Total Assets SAR MN',
-        'Receiveable SAR MN',
-        'Total Liabilities SAR MN',
-        'Payables SAR MN',
-        'Short term Loan SAR MN',
-        'Capital SAR MN',
-        'Lubricant Consumed (Volume) Litres',
+        'Sales Proceed SAR MN', 'NIAT (profit after tax) SAR MN', 'Total Assets SAR MN', 'Receiveable SAR MN',
+        'Total Liabilities SAR MN', 'Payables SAR MN', 'Short term Loan SAR MN', 'Capital SAR MN', 'Lubricant Consumed (Volume) Litres',
     ];
 
     const initialFormData: FormData = {
-        CustomerType: 'CreditCustomers',
-        regionCity: '',
-        applicationDate: new Date().toISOString().split('T')[0],
-        customerchoice: '',
-        tradeNameArabic: '',
-        tradeNameEnglish: '',
-        businessType: '',
-        commercialRegNo: '',
-        companyRegistrationYear: '',
-        unifiedNo: '',
-        vatNo: '',
-        mainActivity: '',
-        managingDirector: '',
-        authorizedSignatory: '',
-        noOfBranches: '',
-        noOfEmployees: '',
-        nationalAddress: '',
-        officialPhone: '',
-        mobileNo: '',
-        officialWebsite: '',
-        paymentCycle: '',
-        poApproverName: '',
-        approverName: '',
-        typeOfSecurity: '',
-        paymentMethod: '',
-        paymentMethodOther: '',
-        creditLimitRequested: '',
-        paymentTerm: '',
+        CustomerType: 'CreditCustomers', regionCity: '', applicationDate: new Date().toISOString().split('T')[0], customerchoice: '',
+        tradeNameArabic: '', tradeNameEnglish: '', businessType: '', commercialRegNo: '', companyRegistrationYear: '', unifiedNo: '',
+        vatNo: '', mainActivity: '', managingDirector: '', authorizedSignatory: '', noOfBranches: '', noOfEmployees: '',
+        nationalAddress: '', officialPhone: '', mobileNo: '', officialWebsite: '', paymentCycle: '', poApproverName: '',
+        approverName: '', typeOfSecurity: '', paymentMethod: '', paymentMethodOther: '', creditLimitRequested: '', paymentTerm: '',
         financialFigures: financialMetrics.reduce((acc, metric) => {
             acc[metric] = { current: '', last: '', previous: '' };
             return acc;
         }, {} as Record<string, FinancialFigureRow>),
-        auditorName: '',
-        contractName: '',
-        projects: Array.from({ length: 5 }, () => ({ name: '', period: '' })),
-        simahTerms: '',
-        requiredDocuments: [],
-        termsCompanyName: '',
-        termsAuthorizedSignatory: '',
-        termsNameOfSponsor: '',
-        termsKAMName: '',
+        auditorName: '', contractName: '', projects: Array.from({ length: 5 }, () => ({ name: '', period: '' })), simahTerms: '',
+        requiredDocuments: [], termsCompanyName: '', termsAuthorizedSignatory: '', termsNameOfSponsor: '', termsKAMName: '',
+        termsStampFile: null, termsSponsorSignatureFile: null, termsAuthorizedSignatureFile: null, termsKAMSignatureFile: null,
+        // Initialize required document files
+        docAuthSignatoryIdFile: null, docMainCommCertFile: null, docVatCertFile: null, docBankStmtFile: null,
+        docIncorpContractFile: null, docFinancialStmtFile: null, docPowerOfAttorneyFile: null, docSponsorIdFile: null,
     };
 
     const createInitialContacts = (): ContactDetail[] =>
         Array.from({ length: 5 }, () => ({
-            Name: "",
-            Designation: "",
-            Email: "",
-            Contact: "",
-            signatureFile: null,
+            Name: "", Designation: "", Email: "", Contact: "", signatureFile: null,
         }));
 
     const [formData, setFormData] = React.useState<FormData>({ ...initialFormData });
@@ -147,12 +121,12 @@ const CreditCustomers = () => {
     const [loading, setLoading] = React.useState(false);
     const [statusMessage, setStatusMessage] = React.useState<string | null>(null);
     const [activeContactIndex, setActiveContactIndex] = React.useState<number | null>(null);
+    const [activeFieldName, setActiveFieldName] = React.useState<keyof FormData | null>(null);
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const Url = "https://prod-25.centralindia.logic.azure.com:443/workflows/5d163597298b424185cb0cb9e4b9b176/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9W4uNSJYqSiUASKzpRIEIJUm9u3LoHXt6ugpWqmJc7U";
 
     // --- HANDLERS ---
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -162,11 +136,7 @@ const CreditCustomers = () => {
         const { value, checked } = e.target;
         setFormData((prev) => {
             let updatedList = prev.businessType ? prev.businessType.split(", ") : [];
-            if (checked) {
-                updatedList.push(value);
-            } else {
-                updatedList = updatedList.filter((item) => item !== value);
-            }
+            if (checked) { updatedList.push(value); } else { updatedList = updatedList.filter((item) => item !== value); }
             return { ...prev, businessType: updatedList.join(", ") };
         });
     };
@@ -175,11 +145,7 @@ const CreditCustomers = () => {
         const { value, checked } = e.target;
         setFormData((prev) => {
             let updatedList = [...prev.requiredDocuments];
-            if (checked) {
-                updatedList.push(value);
-            } else {
-                updatedList = updatedList.filter((item) => item !== value);
-            }
+            if (checked) { updatedList.push(value); } else { updatedList = updatedList.filter((item) => item !== value); }
             return { ...prev, requiredDocuments: updatedList };
         });
     };
@@ -192,14 +158,7 @@ const CreditCustomers = () => {
 
     const handleFinancialChange = (metric: string, year: keyof FinancialFigureRow, value: string) => {
         setFormData(prev => ({
-            ...prev,
-            financialFigures: {
-                ...prev.financialFigures,
-                [metric]: {
-                    ...prev.financialFigures[metric],
-                    [year]: value
-                }
-            }
+            ...prev, financialFigures: { ...prev.financialFigures, [metric]: { ...prev.financialFigures[metric], [year]: value } }
         }));
     };
 
@@ -222,31 +181,44 @@ const CreditCustomers = () => {
         });
     };
     
-    const handleUploadClick = (index: number) => {
+    const handleContactUploadClick = (index: number) => {
         setActiveContactIndex(index);
+        setActiveFieldName(null);
+        fileInputRef.current?.click();
+    };
+    
+    const handleGenericUploadClick = (fieldName: keyof FormData) => {
+        setActiveContactIndex(null);
+        setActiveFieldName(fieldName);
         fileInputRef.current?.click();
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (file && activeContactIndex !== null) {
+        if (!file) return;
+
+        if (activeContactIndex !== null) {
             const updatedContacts = [...contacts];
             updatedContacts[activeContactIndex].signatureFile = file as FileWithPreview;
             setContacts(updatedContacts);
+        } else if (activeFieldName) {
+            setFormData(prev => ({ ...prev, [activeFieldName]: file as FileWithPreview }));
         }
-        // Reset file input to allow selecting the same file again
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+
+        if (fileInputRef.current) { fileInputRef.current.value = ''; }
         setActiveContactIndex(null);
+        setActiveFieldName(null);
     };
     
-    const removeFile = (index: number) => {
+    const removeContactFile = (index: number) => {
         const updatedContacts = [...contacts];
         updatedContacts[index].signatureFile = null;
         setContacts(updatedContacts);
     };
 
+    const removeGenericFile = (fieldName: keyof FormData) => {
+        setFormData(prev => ({ ...prev, [fieldName]: null }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -254,7 +226,10 @@ const CreditCustomers = () => {
         setStatusMessage(null);
 
         try {
-            const filesPayload: FilePayload[] = await Promise.all(
+            const filesPayload: FilePayload[] = [];
+
+            // Process contact signature files
+            await Promise.all(
                 contacts
                     .map((contact, index) => ({ contact, index }))
                     .filter(item => item.contact.signatureFile)
@@ -262,24 +237,73 @@ const CreditCustomers = () => {
                         const { contact, index } = item;
                         const file = contact.signatureFile!;
                         const base64Content = await fileToBase64(file);
-                        return {
+                        filesPayload.push({
                             fileName: `Signature_${index}_0_${file.name}`,
                             contentType: file.type,
                             content: base64Content,
-                        };
+                        });
                     })
             );
 
+            // Process all other standalone files (signatures, stamps, required documents)
+            const fileFieldsToProcess: { field: keyof FormData; prefix: string }[] = [
+                { field: 'termsStampFile', prefix: 'termsStamp_' },
+                { field: 'termsSponsorSignatureFile', prefix: 'termsSignature1_' },
+                { field: 'termsAuthorizedSignatureFile', prefix: 'termsSignature2_' },
+                { field: 'termsKAMSignatureFile', prefix: 'termsSignature3_' },
+                { field: 'docAuthSignatoryIdFile', prefix: 'Authorized_Signatory_ID_' },
+                { field: 'docMainCommCertFile', prefix: 'Main_Commercial_Reg._Certificate_' },
+                { field: 'docVatCertFile', prefix: 'VAT_registration_Certificate_' },
+                { field: 'docBankStmtFile', prefix: 'Official_Bank_Statement_' },
+                { field: 'docIncorpContractFile', prefix: 'Incorporation_Contract_for_the_company_' },
+                { field: 'docFinancialStmtFile', prefix: 'Last_Audited_Financial_Statement_' },
+                { field: 'docPowerOfAttorneyFile', prefix: 'Power_of_Attorney_if_Any_' },
+                { field: 'docSponsorIdFile', prefix: 'Sponsor_ID_' },
+            ];
+            
+            for (const { field, prefix } of fileFieldsToProcess) {
+                const file = formData[field] as FileWithPreview | null;
+                if (file) {
+                    const base64Content = await fileToBase64(file);
+                    filesPayload.push({
+                        fileName: `${prefix}${file.name}`,
+                        contentType: file.type,
+                        content: base64Content,
+                    });
+                }
+            }
+
+            const financialFiguresString = JSON.stringify(
+                Object.entries(formData.financialFigures).map(([metric, values]) => ({
+                    metric: metric.trim(), currentYear: values.current, lastYear: values.last, previousYear: values.previous,
+                }))
+            );
+            
+            const contactsString = JSON.stringify(
+                contacts.filter(c => c.Name || c.Designation || c.Email || c.Contact).map(({ signatureFile, ...rest }) => rest)
+            );
+            
+            // Destructure to remove all file objects from the main payload before sending
+            const { 
+                projects, 
+                termsStampFile, termsSponsorSignatureFile, termsAuthorizedSignatureFile, termsKAMSignatureFile,
+                docAuthSignatoryIdFile, docMainCommCertFile, docVatCertFile, docBankStmtFile,
+                docIncorpContractFile, docFinancialStmtFile, docPowerOfAttorneyFile, docSponsorIdFile,
+                ...restOfFormData 
+            } = formData;
+
             const payload = {
-                ...formData,
-                contacts: contacts.map(({ signatureFile, ...rest }) => rest), // Send contact data without file object
+                ...restOfFormData,
+                financialFigures: financialFiguresString,
+                contacts: contactsString,
+                requiredDocuments: formData.requiredDocuments.join(', '),
+                ProjectName: JSON.stringify(projects.map(p => p.name)),
+                PeriodName: JSON.stringify(projects.map(p => p.period)),
                 files: filesPayload,
             };
 
             const response = await fetch(Url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
             });
 
             if (response.ok) {
@@ -297,17 +321,22 @@ const CreditCustomers = () => {
         }
     };
 
+    const requiredDocumentsList = [
+        { key: 'docAuthSignatoryIdFile', value: 'Authorized Signatory ID', label: 'Authorized Signatory ID / هوية الشخص المفوض بالتوقيع' },
+        { key: 'docMainCommCertFile', value: 'Main Commercial Reg. Certificate', label: 'Main Commercial Reg. Certificate / صورة السجل الرئيسي ساري المفعول' },
+        { key: 'docVatCertFile', value: 'VAT registration Certificate', label: 'VAT registration Certificate / صورة من شهادة ضريبة القيمة المضافة' },
+        { key: 'docBankStmtFile', value: 'Official Bank Statement (last 3 months)', label: 'Official Bank Statement (last 3 months) / كشف حساب بنكي رسمي لآخر ثلاث أشهر' },
+        { key: 'docIncorpContractFile', value: 'Incorporation Contract for the company', label: 'Incorporation Contract for the company / عقد التأسيس' },
+        { key: 'docFinancialStmtFile', value: 'Last Audited Financial Statement', label: 'Last Audited Financial Statement / آخر ميزانية مدققة' },
+        { key: 'docPowerOfAttorneyFile', value: 'Power of Attorney if Any', label: 'Power of Attorney if Any / عقد التوكيل' },
+        { key: 'docSponsorIdFile', value: 'Sponsor ID', label: 'Sponsor ID / هوية الكفيل' },
+    ];
+
+
     // --- RENDER ---
     return (
         <div className="mt-4" style={{ color: 'black', width: '91vw', marginLeft: '4vw' }}>
-            {/* Single hidden file input for all signature uploads */}
-            <input
-                type="file"
-                accept="image/*,.pdf"
-                ref={fileInputRef}
-                style={{ display: "none" }}
-                onChange={handleFileChange}
-            />
+            <input type="file" accept="image/*,.pdf" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
 
             <form onSubmit={handleSubmit}>
                 {/* --- CARD 1: CUSTOMER INFORMATION --- */}
@@ -768,7 +797,7 @@ const CreditCustomers = () => {
                                                                 type="button"
                                                                 className="btn btn-outline-primary btn-sm"
                                                                 style={{ margin: "auto", display: "block", minWidth: "120px" }}
-                                                                onClick={() => handleUploadClick(i)}
+                                                                onClick={() => handleContactUploadClick(i)}
                                                             >
                                                                 Signature Upload
                                                             </button>
@@ -779,7 +808,7 @@ const CreditCustomers = () => {
                                                                     </span>
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => removeFile(i)}
+                                                                        onClick={() => removeContactFile(i)}
                                                                         className="btn-close"
                                                                         aria-label="Remove"
                                                                     ></button>
@@ -984,7 +1013,18 @@ const CreditCustomers = () => {
                             </h6>
                         </div>
                         <div className="row mb-4">
-                           {/* ... Bayan T&C Text ... */}
+                             <div className="col-md-6">
+                                <p style={{ fontSize: '0.8rem' }}>Data supplied, whether personal or otherwise, by Customer and/or which relates to a Customer's account will be held and processed by computer or otherwise by Al Jomaih and Shell Lubricating Oil Company Ltd to operate Customer's account(s); to confirm, update and enhance Al Jomaih and Shell Lubricating Oil Company Ltd's Customer records; for statistical analysis; to establish any identity or otherwise as required under applicable legislation; to assess each Customer's credit status on an ongoing basis; and otherwise as considered necessary or appropriate by Al Jomaih and Shell Lubricating Oil Company Ltd. Al Jomaih and Shell Lubricating Oil Company Limited is also a member of Bayan Credit Beaurue.</p>
+                                <p style={{ fontSize: '0.8rem' }}>In each case the processing may continue after this Agreement has ended. Alternatively, Customer may be requested to complete or fulfil other checks as may be necessary to satisfy credit assessments, money laundering or fraud detection requirements.</p>
+                                <p style={{ fontSize: '0.8rem' }}>Al Jomaih and Shell Lubricating Oil Company Ltd may disclose data relating to Customer and/or a Customer's account(s) to: (a) a credit reference agency where it may be accessed by other financial institutions to assist assessment of any application for credit made to Al Jomaih and Shell Lubricating Oil Company Ltd and for debt tracing and fraud prevention;</p>
+                                <p style={{ fontSize: '0.8rem' }}>I hereby, acknowledge and agree to provide both Al Jomaih and Shell Lubricating Oil Company Ltd and Bayan Credit Information Company (Bayan) with any information required by either of them, in preparation for obtaining any of the services and products issued by Bayan, and/or entering into any of its programs, and/or using any of the relevant services provided Bayan including my consent on the establishment of my credit record. I also authorize said entities jointly and/or severally to collect and keep all necessary data pertaining to me (which belongs to the entity and its owners if the customer was an entity), and to view my financial and credit data/information. I also acknowledge and confirm my approval on allowing Bayan to exchange and distribute my information by and between all relevant parties, including current and potential Bayan members, under special agreements to be signed with them to regulate the exchange of information.</p>
+                                <p style={{ fontSize: '0.8rem' }}>(b) to any guarantor or person providing security in relation to Customer's obligations under this Agreement; (c) as required or permitted by law or any regulatory authority; (d) as otherwise considered necessary or appropriate by Al Jomaih and Shell Lubricating Oil Company Ltd.</p>
+                            </div>
+                            <div className="col-md-6 text-end">
+                                <p style={{ fontSize: '0.8rem' }}>سيتم الاحتفاظ ومعالجة البيانات المقدمة من العميل وا أو تلك المتعلقة بحسابه سواء كانت شخصية او خلافها بواسطة الحاسوب او بواسطة شركة الجميح وشل لزيوت التشحيم المحدودة، وهي البيانات المتعلقه بحسابه \ حساباته للتأكيد وللتحديث ولتعزيز وتحسين سجلات العميل لدى شركة الجميح وشل لزيوت التشحيم المحدودة بغرض اجراء تحليل احصائي، لإنشاء اية هوية او خلافه حسب الطلب والانظمة السارية وللتقييم المستمر للوضع الائتماني لكل عميل. وخلاف ذلك حسب ما تعتبره شركة الجميح وشل لزيوت التشحيم المحدودة ضروريا أو وقد تستمر معالجة ومناولة هذه البيانات في كل حالة لما بعد انتهاء هذا الاتفاق. وقد يطلب بدلا من العميل اتمام او عمل شيكات أخرى حسب ما قد تتطلبه ضرورة متطلبات تلبية تقييم الائتمان، غسيل الأموال اوكشف الاحتيال.</p>
+                                <p style={{ fontSize: '0.8rem' }}>يحق لشركة الجميح وشل لزيوت التشحيم المحدودة الافصاح عن هذه البيانات المتعلقة بالعميل و ا أو بحساباته الى : (أ ) وكالة مرجعية الائتمان حيث يمكن ان تصل اليها مؤسسات مالية أخرى للمساعدة في تقييم طلبات الائتمان المقدمة لشركة الجميح وشل لزيوت التشحيم المحدودة ولمتابعة الديون ومنع الاحتيال</p>
+                                <p style={{ fontSize: '0.8rem' }}>وبهذا أقر وأوافق على تزويد كلا من شركة الجميح وشل لزيوت التشحيم المحدودة وشركة بيان للمعلومات الائتمانية ( بيان ) باية معلومات مطلوبة منهما، تحضيرا لأية خدمات أو منتجات صادرة بواسطة بيان و ١ أو ادخالها في اي من برامجها، و ١ أو استخدام أي من الخدمات المتعلقة بذلك والتي تقدمها بيان شاملة موافقتي على عمل سجل ائتماني لي . كما أفوض أيضا الشركات المذكورة متضامنين و ١ أو منفردين بجمع وحفظ جميع البيانات الضرورية المتعلقة بي ) والتي تخص الشركة / المؤسسة ومالكيها اذا كان العميل هو هذه الشركة \ المؤسسة ) والاطلاع على بياناتي ومعلوماتي المالية المتعلقة بالإئتمان. كما اأقر ايضا وأوكد موافقتي على السماح لبيان لتبادل وتوزيع معلوماتي بواسطة وبين جميع الاطراف التي لها علاقة بذلك، شاملة اعضاء بيان الحاليين والمحتملين بموجب الاتفاقيات خاصة تنظم تبادل المعلومات . ( ب ) الى أي ضامن او شخص يقدم ضمان على التزامات العميل القائمة بموجب هذا الاتفاق ) ج ) حسب الطلب او المسموح به قانونا او اية سلطة 1 منظمة . ( د ) او خلاف ذلك ومما يُعتبر ضروريا أو مناسبا لشركة الجميح وشل لزيوت التشحيم المحدودة.</p>
+                            </div>
                         </div>
 
                         {/* SIMAH Terms and Conditions */}
@@ -1010,9 +1050,65 @@ const CreditCustomers = () => {
                             ))}
                         </div>
 
-                        {/* Individual and Commercial T&C text blocks */}
-                        {/* ... Individual T&C ... */}
-                        {/* ... Commercial T&C ... */}
+                        {formData.simahTerms === 'Individual' && (
+                            <div className="mt-3 p-3 ">
+                                <h6>Individual Terms and Conditions</h6>
+                                <div className="mt-4 p-3 border bg-light" style={{ lineHeight: '1.8' }}>
+                                    <div className="row mb-3">
+                                        <div className="col-md-6">
+                                            <strong>
+                                                I, the undersigned person acknowledge, that my personal data and information are true, accurate and complete, and I acknowledge my approval to authorize (AlJomaih & Shell Lubricating Oil Co. Ltd.) to establish and/or create and/or inquire and/or issue and/or review my credit record in Saudi Credit Bureau (SIMAH) and disclosing my previous, current and future credit information and data and sharing them with all current and potential members of the Saudi Credit Bureau (SIMAH) or any entity who’s   approved by the Saudi Central Bank
+                                            </strong>
+                                        </div>
+                                        <div className="col-md-6" dir="rtl" lang="ar">
+                                            <strong>
+                                                أقر انا الموقع أدناه أن بياناتي ومعلوماتي الشخصية صحيحة ودقيقة وكاملة، وعليه أقر بموافقتي على تفويض (شركة الجميح وشل لزيوت التشحيم المحدودة) في تأسيس و/أو إنشاء و/أو الاستعلام و /أو إصدار و/أو مراجعة سجلي الائتماني لدى الشركة السعودية للمعلومات الائتمانية (سمة) والافصاح عن معلوماتي وبياناتي الائتمانية السابقة والحالية والمستقبلية ومشاركتها مع كافة أعضاء الشركة السعودية للمعلومات الائتمانية (سمة) الحاليين والمحتملين أو لأي جهة يقرها البنك المركزي السعودي
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <p><strong>
+                                                We read and understand the above customer consent and we confirm that we fully understand how to use it and the importance of having the approval from the authorized person before the inquiry.
+                                            </strong></p>
+                                        </div>
+                                        <div className="col-md-6" dir="rtl" lang="ar">
+                                            <strong> تم قرأءة اقرار العميل أعلاه، ونؤكد على فهم ألية تطبيق الاقرار وأهمية أخذ موافقة العميل من الشخص المخول بالتوقيع قبل ، وعليه نوقع: الاستعلام</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {formData.simahTerms === 'Commercial' && (
+                            <div className="mt-3 p-3 ">
+                                <h6>Commercial Terms and Conditions</h6>
+                                <div className="mt-4 p-3 border bg-light" style={{ lineHeight: '1.8' }}>
+                                    <div className="row mb-3">
+                                        <div className="col-md-6">
+                                            <strong>
+                                                the undersigned person acknowledge I,, on behalf of (the name of the company or institution) that the data and information of (the name of the company or institution) are true, accurate and complete, and I also acknowledge that I agree on behalf of (the name of the company or institution) to authorize (AlJomaih & Shell Lubricating Oil Co. Ltd.)  to establish and/or create and/or inquire and/or issue and/ or review the credit record of (the name of the company or institution)in Saudi Credit Bureau (SIMAH) and disclose its previous, current and future credit information and data and sharing them with all current and potential members of the Saudi Credit Bureau (SIMAH) or any entity who’s   approved by the Central Bank
+                                                I also agree, on behalf of the (company or / institution) to inquire about commercial data, information, financial statements, and other relevant information from authorized sources, to disclose and exchange them with all current and / or / potential members of credit information companies.
+                                            </strong>
+                                        </div>
+                                        <div className="col-md-6" dir="rtl" lang="ar">
+                                            <strong>
+                                                أقر انا الموقع أدناه  بالنيابة عن( اسم الشركة أو المؤسسة)  أن بيانات ومعلومات ( اسم الشركة أو المؤسسة) صحيحة ودقيقة وكاملة، كما أقر بالموافقة بالنيابة عن( اسم الشركة أو المؤسسة)  على تفويض (شركة الجميح وشل لزيوت التشحيم المحدودة) في تأسيس و/أو إنشاء و/أو الاستعلام و /أو إصدار و/أو مراجعة السجل الائتماني لـ( اسم الشركة أو المؤسسة) لدى الشركة السعودية للمعلومات الائتمانية (سمة) والافصاح عن معلوماتها وبياناتها الائتمانية السابقة والحالية والمستقبلية ومشاركتها مع كافة أعضاء الشركة السعودية للمعلومات الائتمانية (سمة) الحاليين والمحتملين أو لأي جهة يقرّها البنك المركزي السعودي
+                                                كما أوافق بالنيابة عن ( الشركة أو المؤسسة) عن الاستعلام عن البيانات والمعلومات التجارية والقوائم المالية وغيرها من المعلومات ذات العلاقة من المصادر المصرّحة والافصاح عنها وتبادلها مع كافة أعضاء شركات المعلومات الائتمانية الحاليين و/أو/ المحتملين.
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    <div className="row">
+                                        <div className="col-md-6">
+                                            <p><strong>We read and understand the above customer consent and we confirm that we fully understand how to use it and the importance of having the approval from the authorized person before the inquiry.</strong></p>
+                                        </div>
+                                        <div className="col-md-6" dir="rtl" lang="ar">
+                                            <p><strong>تم قرأءة اقرار العميل أعلاه، ونؤكد على فهم ألية تطبيق الاقرار وأهمية أخذ موافقة العميل من الشخص المخول بالتوقيع قبل الاستعلام، وعليه نوقع:</strong></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         
                         <p className="fw-bold mt-4">
                             I hereby confirm that the information provided above is correct and to the best of my Knowledge, and I am authorized to sign this declaration on behalf of the company. / بهذا أقر بأن المعلومات المقدمة أعلاه صحيحة على حد علمي الجيد ، وأنا المفوض بالتوقيع على نموذج الطلب هذا بالنيابة عن الشركة.
@@ -1020,94 +1116,70 @@ const CreditCustomers = () => {
                         <div className="row mt-4">
                             <div className="col-md-6">
                                 <div className="mb-3">
-                                    <label htmlFor="termsCompanyName" className="form-label">
-                                        Company Name / اسم الشركة
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="termsCompanyName"
-                                        name="termsCompanyName"
-                                        value={formData.termsCompanyName}
-                                        onChange={handleChange}
-                                    />
+                                    <label htmlFor="termsCompanyName" className="form-label">Company Name / اسم الشركة</label>
+                                    <input type="text" className="form-control" id="termsCompanyName" name="termsCompanyName" value={formData.termsCompanyName} onChange={handleChange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsStampFile" className="form-label">
-                                        Company Stamp / الختم اسم الشركة
-                                    </label>
-                                    <br />
-                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => alert('File upload for this section is not yet implemented.')}>
+                                    <label htmlFor="termsStampFile" className="form-label">Company Stamp / الختم اسم الشركة</label><br />
+                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => handleGenericUploadClick('termsStampFile')}>
                                         Upload Company Stamp
                                     </button>
+                                    {formData.termsStampFile && (
+                                        <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                            <span className="text-truncate" style={{ maxWidth: '150px' }}>{formData.termsStampFile.name}</span>
+                                            <button type="button" onClick={() => removeGenericFile('termsStampFile')} className="btn-close" aria-label="Remove"></button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsNameOfSponsor" className="form-label">
-                                        Name of Sponsor / اسم الكفيل
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="termsNameOfSponsor"
-                                        name="termsNameOfSponsor"
-                                        value={formData.termsNameOfSponsor}
-                                        onChange={handleChange}
-                                    />
+                                    <label htmlFor="termsNameOfSponsor" className="form-label">Name of Sponsor / اسم الكفيل</label>
+                                    <input type="text" className="form-control" id="termsNameOfSponsor" name="termsNameOfSponsor" value={formData.termsNameOfSponsor} onChange={handleChange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsSignatureFile" className="form-label">
-                                        Sponsor Signature / التوقيع اسم الكفيل
-                                    </label>
-                                    <br />
-                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => alert('File upload for this section is not yet implemented.')}>
+                                    <label htmlFor="termsSponsorSignatureFile" className="form-label">Sponsor Signature / التوقيع اسم الكفيل</label><br />
+                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => handleGenericUploadClick('termsSponsorSignatureFile')}>
                                         Upload Sponsor Signature
                                     </button>
+                                    {formData.termsSponsorSignatureFile && (
+                                        <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                            <span className="text-truncate" style={{ maxWidth: '150px' }}>{formData.termsSponsorSignatureFile.name}</span>
+                                            <button type="button" onClick={() => removeGenericFile('termsSponsorSignatureFile')} className="btn-close" aria-label="Remove"></button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="col-md-6">
                                 <div className="mb-3">
-                                    <label htmlFor="termsAuthorizedSignatory" className="form-label">
-                                        Authorized Signatory / اسم المفوض
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="termsAuthorizedSignatory"
-                                        name="termsAuthorizedSignatory"
-                                        value={formData.termsAuthorizedSignatory}
-                                        onChange={handleChange}
-                                    />
+                                    <label htmlFor="termsAuthorizedSignatory" className="form-label">Authorized Signatory / اسم المفوض</label>
+                                    <input type="text" className="form-control" id="termsAuthorizedSignatory" name="termsAuthorizedSignatory" value={formData.termsAuthorizedSignatory} onChange={handleChange} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsSignature2File" className="form-label">
-                                        Authorized Signature / التوقيع اسم المفوض
-                                    </label>
-                                    <br />
-                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => alert('File upload for this section is not yet implemented.')}>
+                                    <label htmlFor="termsAuthorizedSignatureFile" className="form-label">Authorized Signature / التوقيع اسم المفوض</label><br />
+                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => handleGenericUploadClick('termsAuthorizedSignatureFile')}>
                                         Upload Authorized Signature
                                     </button>
+                                    {formData.termsAuthorizedSignatureFile && (
+                                        <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                            <span className="text-truncate" style={{ maxWidth: '150px' }}>{formData.termsAuthorizedSignatureFile.name}</span>
+                                            <button type="button" onClick={() => removeGenericFile('termsAuthorizedSignatureFile')} className="btn-close" aria-label="Remove"></button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsKAMName" className="form-label">
-                                        KAM Name / اسم مدير الحساب
-                                    </label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="termsKAMName"
-                                        name="termsKAMName"
-                                        value={formData.termsKAMName}
-                                        onChange={handleChange}
-                                    />
+                                    <label htmlFor="termsKAMName" className="form-label">KAM Name / اسم مدير الحساب</label>
+                                    <input type="text" className="form-control" id="termsKAMName" name="termsKAMName" value={formData.termsKAMName} onChange={handleChange}/>
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor="termsSignature3File" className="form-label">
-                                        KAM Signature / التوقيع اسم مدير الحساب
-                                    </label>
-                                    <br />
-                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => alert('File upload for this section is not yet implemented.')}>
+                                    <label htmlFor="termsKAMSignatureFile" className="form-label">KAM Signature / التوقيع اسم مدير الحساب</label><br />
+                                    <button type="button" className="btn btn-outline-primary btn-sm mt-2" onClick={() => handleGenericUploadClick('termsKAMSignatureFile')}>
                                         Upload KAM Signature
                                     </button>
+                                    {formData.termsKAMSignatureFile && (
+                                        <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                            <span className="text-truncate" style={{ maxWidth: '150px' }}>{formData.termsKAMSignatureFile.name}</span>
+                                            <button type="button" onClick={() => removeGenericFile('termsKAMSignatureFile')} className="btn-close" aria-label="Remove"></button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -1117,42 +1189,37 @@ const CreditCustomers = () => {
                             <h6 className="mb-0">Required Documents / الاوراق المطلوبة</h6>
                         </div>
                         <div className="row">
-                            {[
-                                { id: 'termsAuthSignatoryId', value: 'Authorized Signatory ID', label: 'Authorized Signatory ID / هوية الشخص المفوض بالتوقيع' },
-                                { id: 'termsMainCommCert', value: 'Main Commercial Reg. Certificate', label: 'Main Commercial Reg. Certificate / صورة السجل الرئيسي ساري المفعول' },
-                                { id: 'termsVatCert', value: 'VAT registration Certificate', label: 'VAT registration Certificate / صورة من شهادة ضريبة القيمة المضافة' },
-                                { id: 'termsBankStmt', value: 'Official Bank Statement (last 3 months)', label: 'Official Bank Statement (last 3 months) / كشف حساب بنكي رسمي لآخر ثلاث أشهر' },
-                                { id: 'termsIncorpContract', value: 'Incorporation Contract for the company', label: 'Incorporation Contract for the company / عقد التأسيس' },
-                                { id: 'termsFinancialStmt', value: 'Last Audited Financial Statement', label: 'Last Audited Financial Statement / آخر ميزانية مدققة' },
-                                { id: 'termsPowerOfAttorney', value: 'Power of Attorney', label: 'Power of Attorney if Any / عقد التوكيل' },
-                                { id: 'termsSponsorId', value: 'Sponsor ID', label: 'Sponsor ID / هوية الكفيل' },
-                            ].reduce((acc, doc, index) => {
+                            {requiredDocumentsList.reduce((acc, doc, index) => {
                                 const colIndex = Math.floor(index / 4);
-                                if (!acc[colIndex]) {
-                                    acc[colIndex] = [];
-                                }
+                                if (!acc[colIndex]) { acc[colIndex] = []; }
                                 acc[colIndex].push(doc);
                                 return acc;
-                            }, [] as { id: string, value: string, label: string }[][]).map((colDocs, colIndex) => (
+                            }, [] as typeof requiredDocumentsList[]).map((colDocs, colIndex) => (
                                 <div className="col-md-6" key={colIndex}>
                                     {colDocs.map((doc) => (
-                                        <div className="mb-3" key={doc.id}>
+                                        <div className="mb-3" key={doc.key}>
                                             <div className="form-check">
                                                 <input
                                                     className="form-check-input"
                                                     type="checkbox"
                                                     value={doc.value}
-                                                    id={doc.id}
+                                                    id={doc.key}
                                                     checked={formData.requiredDocuments.includes(doc.value)}
                                                     onChange={handleRequiredDocsChange}
                                                 />
-                                                <label className="form-check-label" htmlFor={doc.id}>
+                                                <label className="form-check-label" htmlFor={doc.key}>
                                                     {doc.label}
                                                 </label>
                                             </div>
-                                            <button type="button" className="btn btn-outline-primary btn-sm mt-1" onClick={() => alert('File upload for this section is not yet implemented.')}>
+                                            <button type="button" className="btn btn-outline-primary btn-sm mt-1" onClick={() => handleGenericUploadClick(doc.key as keyof FormData)}>
                                                 Upload File
                                             </button>
+                                            {formData[doc.key as keyof FormData] && (
+                                                <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                                    <span className="text-truncate" style={{ maxWidth: '150px' }}>{(formData[doc.key as keyof FormData] as File).name}</span>
+                                                    <button type="button" onClick={() => removeGenericFile(doc.key as keyof FormData)} className="btn-close" aria-label="Remove"></button>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -1163,20 +1230,7 @@ const CreditCustomers = () => {
 
                 {/* Submit and Exit Buttons */}
                 <div className="text-center pb-3">
-                    <button
-                        type="submit"
-                        className="btn"
-                        style={{
-                            backgroundColor: '#ffc107',
-                            color: 'black',
-                            border: 'none',
-                            borderRadius: '5px',
-                            padding: '8px 16px',
-                            fontSize: '1rem',
-                            cursor: 'pointer',
-                        }}
-                        disabled={loading}
-                    >
+                    <button type="submit" className="btn" style={{ backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '5px', padding: '8px 16px', fontSize: '1rem', cursor: 'pointer' }} disabled={loading}>
                         {loading ? 'Submitting...' : 'Submit'}
                     </button>
                 </div>
