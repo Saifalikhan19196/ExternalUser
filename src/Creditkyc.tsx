@@ -140,7 +140,7 @@ const CreditCustomers = () => {
             return { ...prev, businessType: updatedList.join(", ") };
         });
     };
-    
+
     const handleRequiredDocsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         setFormData((prev) => {
@@ -180,13 +180,13 @@ const CreditCustomers = () => {
             reader.readAsDataURL(file);
         });
     };
-    
+
     const handleContactUploadClick = (index: number) => {
         setActiveContactIndex(index);
         setActiveFieldName(null);
         fileInputRef.current?.click();
     };
-    
+
     const handleGenericUploadClick = (fieldName: keyof FormData) => {
         setActiveContactIndex(null);
         setActiveFieldName(fieldName);
@@ -209,7 +209,7 @@ const CreditCustomers = () => {
         setActiveContactIndex(null);
         setActiveFieldName(null);
     };
-    
+
     const removeContactFile = (index: number) => {
         const updatedContacts = [...contacts];
         updatedContacts[index].signatureFile = null;
@@ -260,7 +260,7 @@ const CreditCustomers = () => {
                 { field: 'docPowerOfAttorneyFile', prefix: 'Power_of_Attorney_if_Any_' },
                 { field: 'docSponsorIdFile', prefix: 'Sponsor_ID_' },
             ];
-            
+
             for (const { field, prefix } of fileFieldsToProcess) {
                 const file = formData[field] as FileWithPreview | null;
                 if (file) {
@@ -278,18 +278,18 @@ const CreditCustomers = () => {
                     metric: metric.trim(), currentYear: values.current, lastYear: values.last, previousYear: values.previous,
                 }))
             );
-            
+
             const contactsString = JSON.stringify(
                 contacts.filter(c => c.Name || c.Designation || c.Email || c.Contact).map(({ signatureFile, ...rest }) => rest)
             );
-            
+
             // Destructure to remove all file objects from the main payload before sending
-            const { 
-                projects, 
+            const {
+                projects,
                 termsStampFile, termsSponsorSignatureFile, termsAuthorizedSignatureFile, termsKAMSignatureFile,
                 docAuthSignatoryIdFile, docMainCommCertFile, docVatCertFile, docBankStmtFile,
                 docIncorpContractFile, docFinancialStmtFile, docPowerOfAttorneyFile, docSponsorIdFile,
-                ...restOfFormData 
+                ...restOfFormData
             } = formData;
 
             const payload = {
@@ -944,7 +944,7 @@ const CreditCustomers = () => {
                                 </table>
                             </div>
                         </div>
-                        
+
                         {/* Main Project And Contracts */}
                         <div className="mb-5">
                             <div className="p-1 mb-3" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
@@ -1013,7 +1013,7 @@ const CreditCustomers = () => {
                             </h6>
                         </div>
                         <div className="row mb-4">
-                             <div className="col-md-6">
+                            <div className="col-md-6">
                                 <p style={{ fontSize: '0.8rem' }}>Data supplied, whether personal or otherwise, by Customer and/or which relates to a Customer's account will be held and processed by computer or otherwise by Al Jomaih and Shell Lubricating Oil Company Ltd to operate Customer's account(s); to confirm, update and enhance Al Jomaih and Shell Lubricating Oil Company Ltd's Customer records; for statistical analysis; to establish any identity or otherwise as required under applicable legislation; to assess each Customer's credit status on an ongoing basis; and otherwise as considered necessary or appropriate by Al Jomaih and Shell Lubricating Oil Company Ltd. Al Jomaih and Shell Lubricating Oil Company Limited is also a member of Bayan Credit Beaurue.</p>
                                 <p style={{ fontSize: '0.8rem' }}>In each case the processing may continue after this Agreement has ended. Alternatively, Customer may be requested to complete or fulfil other checks as may be necessary to satisfy credit assessments, money laundering or fraud detection requirements.</p>
                                 <p style={{ fontSize: '0.8rem' }}>Al Jomaih and Shell Lubricating Oil Company Ltd may disclose data relating to Customer and/or a Customer's account(s) to: (a) a credit reference agency where it may be accessed by other financial institutions to assist assessment of any application for credit made to Al Jomaih and Shell Lubricating Oil Company Ltd and for debt tracing and fraud prevention;</p>
@@ -1109,7 +1109,7 @@ const CreditCustomers = () => {
                                 </div>
                             </div>
                         )}
-                        
+
                         <p className="fw-bold mt-4">
                             I hereby confirm that the information provided above is correct and to the best of my Knowledge, and I am authorized to sign this declaration on behalf of the company. / بهذا أقر بأن المعلومات المقدمة أعلاه صحيحة على حد علمي الجيد ، وأنا المفوض بالتوقيع على نموذج الطلب هذا بالنيابة عن الشركة.
                         </p>
@@ -1167,7 +1167,7 @@ const CreditCustomers = () => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="termsKAMName" className="form-label">KAM Name / اسم مدير الحساب</label>
-                                    <input type="text" className="form-control" id="termsKAMName" name="termsKAMName" value={formData.termsKAMName} onChange={handleChange}/>
+                                    <input type="text" className="form-control" id="termsKAMName" name="termsKAMName" value={formData.termsKAMName} onChange={handleChange} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="termsKAMSignatureFile" className="form-label">KAM Signature / التوقيع اسم مدير الحساب</label><br />
@@ -1185,7 +1185,7 @@ const CreditCustomers = () => {
                         </div>
 
                         {/* Required Documents */}
-                        <div className="p-1 my-4" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
+                        {/* <div className="p-1 my-4" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
                             <h6 className="mb-0">Required Documents / الاوراق المطلوبة</h6>
                         </div>
                         <div className="row">
@@ -1226,6 +1226,73 @@ const CreditCustomers = () => {
                             ))}
                         </div>
                     </div>
+                </div> */}
+
+                        <div className="p-1 my-4" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
+                            <h6 className="mb-0">Required Documents / الاوراق المطلوبة</h6>
+                        </div>
+
+                        <div className="row">
+                            {requiredDocumentsList
+                                .reduce((acc, doc, index) => {
+                                    const colIndex = Math.floor(index / 4);
+                                    if (!acc[colIndex]) {
+                                        acc[colIndex] = [];
+                                    }
+                                    acc[colIndex].push(doc);
+                                    return acc;
+                                }, [] as typeof requiredDocumentsList[])
+                                .map((colDocs, colIndex) => (
+                                    <div className="col-md-6" key={colIndex}>
+                                        {colDocs.map((doc) => (
+                                            <div className="mb-3" key={doc.key}>
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        value={doc.value}
+                                                        id={doc.key}
+                                                        checked={formData.requiredDocuments.includes(doc.value)}
+                                                        onChange={handleRequiredDocsChange}
+                                                    />
+                                                    <label className="form-check-label" htmlFor={doc.key}>
+                                                        {doc.label}
+                                                    </label>
+                                                </div>
+
+                                                {/* Upload button disabled if checkbox is not checked */}
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-primary btn-sm mt-1"
+                                                    disabled={!formData.requiredDocuments.includes(doc.value)}
+                                                    onClick={() => handleGenericUploadClick(doc.key as keyof FormData)}
+                                                >
+                                                    Upload File
+                                                </button>
+
+                                                {/* Show file name & remove button if uploaded */}
+                                                {formData[doc.key as keyof FormData] && (
+                                                    <div className="mt-2 p-1 border rounded d-flex justify-content-between align-items-center">
+                                                        <span
+                                                            className="text-truncate"
+                                                            style={{ maxWidth: '150px' }}
+                                                        >
+                                                            {(formData[doc.key as keyof FormData] as File).name}
+                                                        </span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeGenericFile(doc.key as keyof FormData)}
+                                                            className="btn-close"
+                                                            aria-label="Remove"
+                                                        ></button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Submit and Exit Buttons */}
@@ -1249,7 +1316,7 @@ const CreditCustomers = () => {
                     </div>
                 </div>
             )}
-            
+
             {/* Success / Error Message Modal */}
             {statusMessage && !loading && (
                 <div className="modal fade show" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', position: 'fixed', inset: 0, zIndex: 1050 }}>
