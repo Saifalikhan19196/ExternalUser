@@ -3,9 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate } from 'react-router-dom';
 
 
-
-// --- INTERFACES ---
-
 interface FinancialFigureRow {
     current: string;
     last: string;
@@ -64,7 +61,7 @@ interface FormData {
     termsSponsorSignatureFile: FileWithPreview | null;
     termsAuthorizedSignatureFile: FileWithPreview | null;
     termsKAMSignatureFile: FileWithPreview | null;
-    // Files for Required Documents section
+
     docAuthSignatoryIdFile: FileWithPreview | null;
     docMainCommCertFile: FileWithPreview | null;
     docVatCertFile: FileWithPreview | null;
@@ -86,7 +83,7 @@ interface ContactDetail {
 interface FilePayload {
     fileName: string;
     contentType: string;
-    content: string; // base64
+    content: string;
 }
 
 const CreditCustomers = () => {
@@ -96,28 +93,68 @@ const CreditCustomers = () => {
         navigate('/');
     };
 
-    // --- STATE MANAGEMENT ---
+
     const financialMetrics = [
         'Sales Proceed SAR MN', 'NIAT (profit after tax) SAR MN', 'Total Assets SAR MN', 'Receiveable SAR MN',
         'Total Liabilities SAR MN', 'Payables SAR MN', 'Short term Loan SAR MN', 'Capital SAR MN', 'Lubricant Consumed (Volume) Litres',
     ];
 
     const initialFormData: FormData = {
-        CustomerType: 'Credit Customers', regionCity: '', applicationDate: new Date().toISOString().split('T')[0], customerchoice: '',
-        tradeNameArabic: '', tradeNameEnglish: '', businessType: '', commercialRegNo: '', companyRegistrationYear: '', unifiedNo: '',
-        vatNo: '', mainActivity: '', managingDirector: '', authorizedSignatory: '', noOfBranches: '', noOfEmployees: '',
-        nationalAddress: '', officialPhone: '', mobileNo: '', officialWebsite: '', paymentCycle: '', poApproverName: '',
-        approverName: '', typeOfSecurity: '', paymentMethod: '', paymentMethodOther: '', creditLimitRequested: '', paymentTerm: '',
+        CustomerType: 'Credit Customers',
+        regionCity: '',
+        applicationDate: new Date().toISOString().split('T')[0],
+        customerchoice: '',
+        tradeNameArabic: '',
+        tradeNameEnglish: '',
+        businessType: '',
+        commercialRegNo: '',
+        companyRegistrationYear: '',
+        unifiedNo: '',
+
+        vatNo: '',
+        mainActivity: '',
+        managingDirector: '',
+        authorizedSignatory: '',
+        noOfBranches: '',
+        noOfEmployees: '',
+        nationalAddress: '',
+        officialPhone: '',
+        mobileNo: '',
+        officialWebsite: '',
+        paymentCycle: '',
+        poApproverName: '',
+        approverName: '',
+        typeOfSecurity: '',
+        paymentMethod: '',
+        paymentMethodOther: '',
+        creditLimitRequested: '',
+        paymentTerm: '',
         financialFigures: financialMetrics.reduce((acc, metric) => {
             acc[metric] = { current: '', last: '', previous: '' };
             return acc;
         }, {} as Record<string, FinancialFigureRow>),
-        auditorName: '', contractName: '', projects: Array.from({ length: 5 }, () => ({ name: '', period: '' })), simahTerms: '',
-        requiredDocuments: [], termsCompanyName: '', termsAuthorizedSignatory: '', termsNameOfSponsor: '', termsKAMName: '',
-        termsStampFile: null, termsSponsorSignatureFile: null, termsAuthorizedSignatureFile: null, termsKAMSignatureFile: null,
-        // Initialize required document files
-        docAuthSignatoryIdFile: null, docMainCommCertFile: null, docVatCertFile: null, docBankStmtFile: null,
-        docIncorpContractFile: null, docFinancialStmtFile: null, docPowerOfAttorneyFile: null, docSponsorIdFile: null,
+        auditorName: '',
+        contractName: '',
+        projects: Array.from({ length: 5 }, () => ({ name: '', period: '' })),
+        simahTerms: '',
+        requiredDocuments: [],
+        termsCompanyName: '',
+        termsAuthorizedSignatory: '',
+        termsNameOfSponsor: '',
+        termsKAMName: '',
+        termsStampFile: null,
+        termsSponsorSignatureFile: null,
+        termsAuthorizedSignatureFile: null,
+        termsKAMSignatureFile: null,
+
+        docAuthSignatoryIdFile: null,
+        docMainCommCertFile: null,
+        docVatCertFile: null,
+        docBankStmtFile: null,
+        docIncorpContractFile: null,
+        docFinancialStmtFile: null,
+        docPowerOfAttorneyFile: null,
+        docSponsorIdFile: null,
     };
 
     const createInitialContacts = (): ContactDetail[] =>
@@ -1372,29 +1409,29 @@ const CreditCustomers = () => {
             )} */}
 
             {/* Loading Modal */}
-{loading && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-yellow-500 mx-auto mb-4"></div>
-      <h5 className="text-lg font-medium text-gray-800">Submitting your form...</h5>
-    </div>
-  </div>
-)}
+            {loading && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-yellow-500 mx-auto mb-4"></div>
+                        <h5 className="text-lg font-medium text-gray-800">Submitting your form...</h5>
+                    </div>
+                </div>
+            )}
 
-{/* Success / Error Message Modal */}
-{statusMessage && !loading && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bgOpacity-50">
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-      <h5 className="text-lg font-medium text-gray-800 mb-4">{statusMessage}</h5>
-      <button
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        onClick={() => setStatusMessage(null)}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
+            {/* Success / Error Message Modal */}
+            {statusMessage && !loading && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bgOpacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+                        <h5 className="text-lg font-medium text-gray-800 mb-4">{statusMessage}</h5>
+                        <button
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                            onClick={() => setStatusMessage(null)}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

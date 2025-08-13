@@ -22,7 +22,7 @@ interface FormData {
     customerchoice: string;
     tradeNameArabic: string;
     tradeNameEnglish: string;
-    businessType: string; // This will be a comma-separated string
+    businessType: string;
     commercialRegNo: string;
     date: string;
     expiryDate: string;
@@ -36,9 +36,7 @@ interface FormData {
     officialPhone: string;
     mobileNo: string;
     officialWebsite: string;
-    
-    
-    // Cash in advance section fields
+
     companyNameCash: string;
     authorizedSignatoryCash: string;
     kamNameCash: string;
@@ -47,9 +45,9 @@ interface FormData {
     kamSignatureFile: FileWithPreview | null;
 
     requiredDocuments: string[];
-    
-authorizedStaff:string[]
-    // File fields for Required Documents section
+
+    authorizedStaff: string[]
+
     docAuthSignatoryIdFile: FileWithPreview | null;
     docMainCommCertFile: FileWithPreview | null;
     docVatCertFile: FileWithPreview | null;
@@ -58,7 +56,7 @@ authorizedStaff:string[]
 interface FilePayload {
     fileName: string;
     contentType: string;
-    content: string; // base64
+    content: string;
 }
 
 
@@ -68,8 +66,6 @@ const CashCustomers = () => {
     const Exit = () => {
         navigate('/');
     };
-
-    // --- STATE MANAGEMENT ---
 
     const initialFormData: FormData = {
         CustomerType: 'Cash Customers',
@@ -92,7 +88,7 @@ const CashCustomers = () => {
         officialPhone: '',
         mobileNo: '',
         officialWebsite: '',
-        authorizedStaff: [], 
+        authorizedStaff: [],
         companyNameCash: '',
         authorizedSignatoryCash: '',
         kamNameCash: '',
@@ -117,10 +113,10 @@ const CashCustomers = () => {
     const [activeFieldName, setActiveFieldName] = React.useState<keyof FormData | null>(null);
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
- const Url = "https://prod-25.centralindia.logic.azure.com:443/workflows/5d163597298b424185cb0cb9e4b9b176/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9W4uNSJYqSiUASKzpRIEIJUm9u3LoHXt6ugpWqmJc7U";
+    const Url = "https://prod-25.centralindia.logic.azure.com:443/workflows/5d163597298b424185cb0cb9e4b9b176/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9W4uNSJYqSiUASKzpRIEIJUm9u3LoHXt6ugpWqmJc7U";
 
 
-    // --- HANDLERS ---
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -147,7 +143,7 @@ const CashCustomers = () => {
                 updatedList.push(value);
             } else {
                 updatedList = updatedList.filter((item) => item !== value);
-                 // Also remove the file when unchecked
+
                 const docKey = requiredDocumentsList.find(d => d.value === value)?.key;
                 if (docKey) {
                     return { ...prev, requiredDocuments: updatedList, [docKey]: null };
@@ -204,7 +200,7 @@ const CashCustomers = () => {
 
         try {
             const filesPayload: FilePayload[] = [];
-            
+
             const fileFieldsToProcess: { field: keyof FormData; prefix: string }[] = [
                 { field: 'companyStampFile', prefix: 'CompanyStamp_' },
                 { field: 'authorizedSignatureFile', prefix: 'AuthorizedSignature_' },
@@ -229,7 +225,7 @@ const CashCustomers = () => {
             const staffString = JSON.stringify(
                 authorizedStaff.filter(s => s.name || s.designation || s.iqamah || s.validityDate)
             );
-            
+
             const {
                 companyStampFile, authorizedSignatureFile, kamSignatureFile,
                 docAuthSignatoryIdFile, docMainCommCertFile, docVatCertFile,
@@ -246,12 +242,12 @@ const CashCustomers = () => {
             const response = await fetch(Url, {
                 method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
             });
-            
+
             if (response.ok) {
                 setStatusMessage("Form submitted successfully!");
                 setFormData({ ...initialFormData });
                 setAuthorizedStaff(createInitialStaff());
-                setTimeout(() => navigate('/'),500); 
+                setTimeout(() => navigate('/'), 500);
             } else {
                 throw new Error(`Server responded with status: ${response.status}`);
             }
@@ -268,8 +264,7 @@ const CashCustomers = () => {
         { key: 'docMainCommCertFile', value: 'Main Commercial Certificate', label: 'Main Commercial Reg.Certificate / صورة السجل الرئيسي ساري المفعول' },
         { key: 'docVatCertFile', value: 'VAT registration Certificate', label: 'VAT registration Certificate / صورة من شهادة ضريبة القيمة المضافة' },
     ];
-    
-    // --- RENDER ---
+
     return (
         <div className="mt-4" style={{ color: 'black', width: '91vw', marginLeft: '4vw' }}>
             <input type="file" accept="image/*,.pdf" ref={fileInputRef} style={{ display: "none" }} onChange={handleFileChange} />
@@ -343,7 +338,7 @@ const CashCustomers = () => {
                             <div className="p-1 mb-4" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
                                 <h6 className="mb-0">Basic Information / المعلومات الأساسية</h6>
                             </div>
-                             <div className="row">
+                            <div className="row">
                                 <div className="col-md-6 mb-3">
                                     <label htmlFor="tradeNameArabic" className="form-label">Trade Name (Arabic) <span className="text-danger">*</span></label><br />
                                     اسم العميل التجاري ( عربي ) <br /><br />
@@ -392,7 +387,7 @@ const CashCustomers = () => {
                                         ))}
                                     </div>
                                     <div className="col-md-6">
-                                         {['Partnership', 'Limited Liability'].map((type) => (
+                                        {['Partnership', 'Limited Liability'].map((type) => (
                                             <div className="form-check" key={type}>
                                                 <input
                                                     className="form-check-input" type="checkbox" name="businessType"
@@ -400,14 +395,14 @@ const CashCustomers = () => {
                                                     checked={formData.businessType.includes(type)} onChange={handleBusinessTypeChange}
                                                 />
                                                 <label className="form-check-label" htmlFor={type.toLowerCase().replace(' ', '')}>
-                                                     {type} / {type === 'Partnership' ? 'تضامنية' : 'مسؤولية محدودة'}
+                                                    {type} / {type === 'Partnership' ? 'تضامنية' : 'مسؤولية محدودة'}
                                                 </label>
                                             </div>
                                         ))}
                                     </div>
                                 </div>
                             </div>
-                             <div className="row">
+                            <div className="row">
                                 <div className="col-md-4 mb-3">
                                     <label htmlFor="commercialRegNo" className="form-label">Commercial Reg. No. <span className="text-danger">*</span></label><br />
                                     رقم السجل التجاري <br /><br />
@@ -462,7 +457,7 @@ const CashCustomers = () => {
                                     required
                                 />
                             </div>
-                             <div className="mb-3">
+                            <div className="mb-3">
                                 <label htmlFor="mainActivity" className="form-label">Main Activity / النشاط الرئيسي <span className="text-danger">*</span></label>
                                 <input
                                     id="mainActivity"
@@ -501,7 +496,7 @@ const CashCustomers = () => {
                                     required
                                 />
                             </div>
-                             <div className="row">
+                            <div className="row">
                                 <div className="col-md-6 mb-3">
                                     <label htmlFor="noOfBranches" className="form-label">No. of Branches / عدد الفروع <span className="text-danger">*</span></label>
                                     <input
@@ -583,9 +578,9 @@ const CashCustomers = () => {
                                 />
                             </div>
                         </div>
-                        
+
                         {/* Authorized Staff */}
-                         <div className="mb-5">
+                        <div className="mb-5">
                             <div className="p-1 mb-4" style={{ backgroundColor: '#fbce07', borderRadius: '2px', color: '#EC1C24' }}>
                                 <h6 className="mb-0">Authorized Finance and Procurement Department Staff / المعتمدين في قسم المالية و المشتريات لدى الشركة</h6>
                             </div>
