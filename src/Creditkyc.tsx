@@ -842,7 +842,7 @@ const CreditCustomers = () => {
                                                             <button
                                                                 type="button"
                                                                 className="btn btn-outline-primary btn-sm"
-                                                                style={{ margin: "auto", display: "block", minWidth: "120px", marginTop: "26px" }}
+                                                                style={{ margin: "auto", display: "block", minWidth: "120px", marginTop: "26px", marginRight:'134px' ,marginBlock:'22px'}}
                                                                 onClick={() => handleContactUploadClick(i)}
                                                             >
                                                                 Signature Upload
