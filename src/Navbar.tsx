@@ -1,9 +1,15 @@
 import React from "react";
 import './Navbar.css';
 import logo from "./assets/JOSLOC.png";
+import { useNavigate } from 'react-router-dom';
 
 
 const Navbar: React.FC = () => {
+     const navigate = useNavigate();
+
+    const Exit = () => {
+        navigate('/');
+    };
   const handleImageError = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
@@ -21,7 +27,9 @@ const Navbar: React.FC = () => {
           className='navbarLogo'
           onError={handleImageError}
         />
-       
+         <button className='navbarButton' onClick={Exit} >
+                    KYC Home
+                </button>
       </div>
       <div className='navbarTitle'>Customer KYC</div>
     </div>
