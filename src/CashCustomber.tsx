@@ -92,7 +92,7 @@ const CashCustomers = () => {
         officialPhone: '',
         mobileNo: '',
         officialWebsite: '',
-        authorizedStaff: [], // This is managed by a separate state
+        authorizedStaff: [], 
         companyNameCash: '',
         authorizedSignatoryCash: '',
         kamNameCash: '',
@@ -251,7 +251,7 @@ const CashCustomers = () => {
                 setStatusMessage("Form submitted successfully!");
                 setFormData({ ...initialFormData });
                 setAuthorizedStaff(createInitialStaff());
-                setTimeout(() => navigate('/'), 2000); // Navigate after showing success
+                setTimeout(() => navigate('/'),500); 
             } else {
                 throw new Error(`Server responded with status: ${response.status}`);
             }

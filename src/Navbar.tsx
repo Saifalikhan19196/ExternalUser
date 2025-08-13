@@ -5,15 +5,13 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Navbar: React.FC = () => {
-     const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const Exit = () => {
-        navigate('/');
-    };
-  const handleImageError = (
-    e: React.SyntheticEvent<HTMLImageElement, Event>
-  ) => {
-    e.currentTarget.onerror = null; // Prevent infinite loop
+  const Exit = () => {
+    navigate('/');
+  };
+  const handleImageError = ( e: React.SyntheticEvent<HTMLImageElement, Event>  ) => {
+    e.currentTarget.onerror = null; 
     e.currentTarget.src =
       "https://aljomaihshell0.sharepoint.com/SiteAssets/JOSLOC.JPG";
   };
@@ -27,9 +25,9 @@ const Navbar: React.FC = () => {
           className='navbarLogo'
           onError={handleImageError}
         />
-         <button className='navbarButton' onClick={Exit} >
-                    KYC Home
-                </button>
+        <button className='navbarButton' onClick={Exit} >
+          KYC Home
+        </button>
       </div>
       <div className='navbarTitle'>Customer KYC</div>
     </div>
